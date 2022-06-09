@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>empty-heart.png</file>
+        <file>background.qrc</file>
+    </qresource>
+</RCC>
