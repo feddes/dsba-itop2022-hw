@@ -2,7 +2,7 @@
 #define INFOWINDOW_H
 
 #include <QDialog>
-#include <QStringListModel>
+#include <QStandardItemModel>
 
 #include "song.h"
 
@@ -18,11 +18,10 @@ class InfoWindow : public QDialog
    public:
     explicit InfoWindow(QWidget *parent = nullptr);
     ~InfoWindow();
-    void getData(Song sng);
+    void getData(QStandardItemModel *plst, int songNumber);
 
    private:
     Ui::InfoWindow *ui;
-    Song *sng;
 };
 
 #endif  // INFOWINDOW_H

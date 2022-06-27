@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <vector>
-
+#include <set>
 #include "proxymodel.h"
 #include "song.h"
 
@@ -24,7 +24,11 @@ class MainWindow : public QMainWindow
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void createTable();
+    void createTable(std::set<std::string>& genres);
+
+    void createPlst();
+
+    void insertRow(Song sng,int i);
 
    private slots:
 
@@ -56,15 +60,17 @@ class MainWindow : public QMainWindow
 
     void on_Artist_textChanged(const QString &arg1);
 
-    void on_Genre_textChanged(const QString &arg1);
-
     void openAbout();
 
-   private:
+    void on_Genre_currentTextChanged(const QString &arg1);
+
+    void on_pushButton_clicked();
+
+private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
-    std::vector<Song> vec;
-    std::vector<Song> plst;
+    QStandardItemModel *plst;
     ProxyModel *prModel;
+    QStringList lst;
 };
 #endif  // MAINWINDOW_H

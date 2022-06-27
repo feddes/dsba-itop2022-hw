@@ -1,17 +1,20 @@
 #include "mainwindow.h"
-
+#include <QComboBox>
 #include <QFile>
 #include <QFileDialog>
+#include <QStringList>
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <fstream>
 #include <sstream>
-
+#include <string>
+#include <set>
 #include "./ui_mainwindow.h"
 #include "aboutwindow.h"
 #include "addwindow.h"
 #include "playlistwindow.h"
 #include "song.h"
+#include "editwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -20,9 +23,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->menuFile->addAction("About", this, SLOT(openAbout()));
 
-    createTable();
+    std::set<std::string> genres;
+    createTable(genres);
+
+    createPlst();
 
     ui->label->setScaledContents(true);
+
 
     // assigning proxyModel to a tableView
     prModel = new ProxyModel();
@@ -32,6 +39,12 @@ MainWindow::MainWindow(QWidget *parent)
     // sorting
     ui->tableView->setSortingEnabled(true);
     ui->tableView->sortByColumn(1, Qt::SortOrder::AscendingOrder);
+
+    // editing blocker
+    // The command below disables editing of the rows in the table
+     ui->tableView->setEditTriggers(
+       QAbstractItemView::EditTrigger::NoEditTriggers);
+
 
     // spinBoxes
     ui->minYear->setMinimum(2010);
@@ -65,13 +78,37 @@ MainWindow::MainWindow(QWidget *parent)
     ui->maxDur->setMinimum(0);
     ui->maxDur->setMaximum(1000);
     ui->maxDur->setValue(1000);
+
+    //ComboBox
+    std::set<std::string>::iterator it = genres.begin();
+    for (; it != genres.end();++it)
+        lst += QString::fromStdString(*it);
+    ui->Genre->addItems(lst);
+    genres.clear();
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
-void MainWindow::createTable()
+void MainWindow::insertRow(Song sng, int i)
 {
-    model = new QStandardItemModel(0, 6, this);
+    model->insertRows(i, 1);
+    // Inserting data of the song in each column of the row
+    model->setData(model->index(i, 0),
+                   QString::fromStdString(sng.title));
+    model->setData(model->index(i, 1),
+                   QString::fromStdString(sng.artist));
+    model->setData(model->index(i, 2),
+                   QString::fromStdString(sng.genre));
+    model->setData(model->index(i, 3), (sng.year));
+    model->setData(model->index(i, 4), (sng.dance));
+    model->setData(model->index(i, 5), (sng.energy));
+    model->setData(model->index(i, 6), (sng.duration));
+}
+
+
+void MainWindow::createTable(std::set<std::string>& genres)
+{
+    model = new QStandardItemModel(0, 7, this);
 
     model->setHorizontalHeaderItem(0, new QStandardItem("Title"));
     model->setHorizontalHeaderItem(1, new QStandardItem("Artist"));
@@ -84,16 +121,12 @@ void MainWindow::createTable()
     // Link the Table model with the table visible in the User Interface (UI)
     ui->tableView->setModel(model);
 
-    // The command below disables editing of the rows in the table
-    // ui->tableView->setEditTriggers(
-    //   QAbstractItemView::EditTrigger::NoEditTriggers);
-
     std::ifstream inputData("top10s.csv");
 
     std::string line, token;
     std::getline(inputData, line);
     // we need this trick to skip the first line with the headers
-
+    int i = 0;
     while (std::getline(inputData, line))  // parsing our table
     {
         std::istringstream ss(line);
@@ -110,69 +143,118 @@ void MainWindow::createTable()
             if (i != lineAsVector.size() - 14)
                 temp += ",";
         }
-        sng.title = temp;
-        sng.artist = lineAsVector[lineAsVector.size() - 13];
-        sng.genre = lineAsVector[lineAsVector.size() - 12];
+        std::string title = temp.substr(1,temp.size()-2);
+        std::string art = lineAsVector[lineAsVector.size() - 13];
+        std::string gnr = lineAsVector[lineAsVector.size() - 12];
+        sng.title = title;
+        sng.artist = art.substr(1,art.size()-2);
+        sng.genre = gnr.substr(1,gnr.size()-2);
         sng.year = std::stoi(lineAsVector[lineAsVector.size() - 11]);
         sng.energy = std::stoi(lineAsVector[lineAsVector.size() - 9]);
         sng.dance = std::stoi(lineAsVector[lineAsVector.size() - 8]);
         sng.duration = std::stoi(lineAsVector[lineAsVector.size() - 4]);
-        this->vec.push_back(sng);
-    }
-    inputData.close();
-
-    for (int i = 0; i < vec.size(); i++)
-    {
-        model->insertRows(i, 1);
-        // Inserting data of the city in each column of the row
-        model->setData(model->index(i, 0),
-                       QString::fromStdString(vec[i].title));
-        model->setData(model->index(i, 1),
-                       QString::fromStdString(vec[i].artist));
-        model->setData(model->index(i, 2),
-                       QString::fromStdString(vec[i].genre));
-        model->setData(model->index(i, 3), (vec[i].year));
-        model->setData(model->index(i, 4), (vec[i].dance));
-        model->setData(model->index(i, 5), (vec[i].energy));
-        model->setData(model->index(i, 6), (vec[i].duration));
-    }
+        genres.insert(sng.genre);
+        insertRow(sng,i);
+        ++i;
+        }
+      inputData.close();
 }
+void MainWindow::createPlst()
+{
+    plst = new QStandardItemModel(0, 7, this);
 
+    plst->setHorizontalHeaderItem(0, new QStandardItem("Title"));
+    plst->setHorizontalHeaderItem(1, new QStandardItem("Artist"));
+    plst->setHorizontalHeaderItem(2, new QStandardItem("Genre"));
+    plst->setHorizontalHeaderItem(3, new QStandardItem("Year"));
+    plst->setHorizontalHeaderItem(4, new QStandardItem("Energy"));
+    plst->setHorizontalHeaderItem(5, new QStandardItem("Dance"));
+    plst->setHorizontalHeaderItem(6, new QStandardItem("Duration"));
+}
 void MainWindow::on_Playlist_clicked()
 {
-    playlistWindow plw(this, plst);
-    plw.setWindowTitle("Playlist");
-    plw.setModal(true);
-    plw.exec();
-}
+    if (plst->rowCount() > 0)
+    {
+        playlistWindow plw(this, plst, &lst);
+        plw.setWindowTitle("Playlist");
+        plw.setModal(true);
+        plw.exec();
+    }
+    else
+    {
+        QMessageBox* msgBox = new QMessageBox(this);
+        msgBox->setText("Playlist is empty!");
+        msgBox->setMinimumHeight(350);
+        msgBox->setMinimumWidth(350);
+        msgBox->exec();
 
+    }
+}
 void MainWindow::on_AddToPlaylist_clicked()
 {
+
     QModelIndex index = this->ui->tableView->currentIndex();
     prModel->mapToSource(index);
     QModelIndex index2 = prModel->mapToSource(index);
     int songNumber = index2.row();
-    plst.push_back(vec[songNumber]);
+    int i = plst->rowCount();
+    QString title = model->data(model->index(songNumber,0)).toString();
+    QString artist = model->data(model->index(songNumber,1)).toString();
+    QString genre = model->data(model->index(songNumber,2)).toString();
+    QString year = model->data(model->index(songNumber,3)).toString();
+    QString energy = model->data(model->index(songNumber,4)).toString();
+    QString dance = model->data(model->index(songNumber,5)).toString();
+    QString dur = model->data(model->index(songNumber,6)).toString();
+    int x = 1;;
+    for (int j = 0; j < i;++j)
+        if((plst->data(plst->index(j,0))) == title)
+            x = 0;
+    if (x)
+    {
+        plst->insertRows(i, 1);
+        plst->setData(plst->index(i, 0),title);
+        plst->setData(plst->index(i, 1),artist);
+        plst->setData(plst->index(i, 2),genre);
+        plst->setData(plst->index(i, 3),year);
+        plst->setData(plst->index(i, 4),energy);
+        plst->setData(plst->index(i, 5),dance);
+        plst->setData(plst->index(i, 6),dur);
+    }
+    else
+    {
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setText("This song is already in playlist!");
+        msgBox->setMinimumHeight(350);
+        msgBox->setMinimumWidth(350);
+        msgBox->exec();
+    }
 }
 
 void MainWindow::on_SaveCSV_clicked()
 {
     QString filename =
         QFileDialog::getSaveFileName(this, "Save file", "", ".csv");
-
     QFile f(filename);
-    f.open(QIODevice::WriteOnly);
+    QString textData;
+    int rows = model->rowCount();
+    int columns = model->columnCount();
     f.write("TITLE,ARTIST,TOP GENRE,YEAR,ENERGY,DANCE,DURATION\n");
-
-    for (int i = 0; i < vec.size(); i++)
+    for (int i = 0; i < rows; i++)
     {
-        std::stringstream ss;
-        ss << vec[i].title << "," << vec[i].artist << "," << vec[i].genre << ","
-           << vec[i].year << "," << vec[i].energy << "," << vec[i].dance << ","
-           << vec[i].duration << '\n';
-        f.write(ss.str().c_str());
+        for (int j = 0; j < columns; j++)
+        {
+                textData += model->data(model->index(i,j)).toString();
+                textData += "," ;
+        }
+        textData += "\n";
     }
-    f.close();
+
+    if(f.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        QTextStream out(&f);
+        out << textData;
+        f.close();
+    }
 }
 
 void MainWindow::on_DeleteFromPL_clicked()
@@ -181,34 +263,14 @@ void MainWindow::on_DeleteFromPL_clicked()
     prModel->mapToSource(index);
     QModelIndex index2 = prModel->mapToSource(index);
     int songNumber = index2.row();
-    std::cout << vec[songNumber].title;
+    model->removeRow(songNumber);
 
-    int x = -1;
-    for (int i = 0; i < plst.size(); ++i)
-        if (vec[songNumber].title == plst[i].title)
-            x = i;
-    if (x == -1)
-    {
-        QMessageBox *msgBox = new QMessageBox(this);
-        msgBox->setText("Song is not in the playlist!");
-        msgBox->setMinimumHeight(350);
-        msgBox->setMinimumWidth(350);
-        msgBox->exec();
-    }
-    // delete the song from vector
-    else
-    {
-        std::vector<Song>::iterator it = this->plst.begin() + x;
-        this->plst.erase(it);
-    }
 }
 
 void MainWindow::on_Add_clicked()
 {
-    AddWindow add;
-    Song newSong;
-    this->vec.push_back(newSong);
-    add.setPointers(&vec[vec.size() - 1], model);
+    AddWindow add(this, &lst);
+    add.setPointers(model);
     add.setWindowTitle("Adder");
     add.setModal(true);
     add.exec();
@@ -267,7 +329,24 @@ void MainWindow::on_Artist_textChanged(const QString &arg1)
     prModel->setArtist(ui->Artist->text());
 }
 
-void MainWindow::on_Genre_textChanged(const QString &arg1)
+void MainWindow::on_Genre_currentTextChanged(const QString &arg1)
 {
-    prModel->setGenre(ui->Genre->text());
+    prModel->setGenre(arg1);
 }
+
+
+void MainWindow::on_pushButton_clicked()
+{
+
+    QModelIndex index = this->ui->tableView->currentIndex();
+    prModel->mapToSource(index);
+    QModelIndex index2 = prModel->mapToSource(index);
+    int songNumber = index2.row();
+
+    EditWindow edw(this,&lst);
+    edw.setPointers(model, songNumber);
+    edw.setModal(true);
+    edw.setWindowTitle("Edit");
+    edw.exec();
+}
+

@@ -21,24 +21,34 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2" rowstretch="0" columnstretch="0">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,1,1,1,1" columnstretch="1,1,1">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Title</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QLineEdit" name="Duration"/>
-     </item>
-     <item row="4" column="2">
-      <widget class="QLineEdit" name="Energy"/>
-     </item>
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0" columnstretch="1,0,0">
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Year</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" rowspan="2">
+      <widget class="QLineEdit" name="Artist">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Energy</string>
        </property>
       </widget>
      </item>
@@ -49,23 +59,20 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
-      <widget class="QLabel" name="label_5">
+     <item row="6" column="1">
+      <widget class="QPushButton" name="Add">
        <property name="text">
-        <string>Energy</string>
+        <string>Add Song</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLineEdit" name="Year"/>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLineEdit" name="Dance"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Artist</string>
+     <item row="1" column="0" rowspan="2">
+      <widget class="QLineEdit" name="Title">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -83,21 +90,53 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
-      <widget class="QPushButton" name="Add">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="maximumSize">
+        <size>
+         <width>300</width>
+         <height>50</height>
+        </size>
+       </property>
        <property name="text">
-        <string>Add Song</string>
+        <string>Title</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0" rowspan="2">
-      <widget class="QLineEdit" name="Title"/>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Artist</string>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="1" rowspan="2">
-      <widget class="QLineEdit" name="Artist"/>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="Genre"/>
      </item>
-     <item row="1" column="2" rowspan="2">
-      <widget class="QLineEdit" name="Genre"/>
+     <item row="4" column="2">
+      <widget class="QSpinBox" name="Energy">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QSpinBox" name="Year"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QSpinBox" name="Dance"/>
+     </item>
+     <item row="6" column="2">
+      <widget class="QSpinBox" name="Duration"/>
      </item>
     </layout>
    </item>

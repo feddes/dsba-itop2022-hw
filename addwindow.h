@@ -14,18 +14,18 @@ class AddWindow : public QDialog
     Q_OBJECT
 
    public:
-    explicit AddWindow(QWidget *parent = nullptr);
+    explicit AddWindow(QWidget *parent = nullptr, QStringList *lst = {});
     ~AddWindow();
 
-    void setPointers(Song *song, QStandardItemModel *model);
+    void setPointers(QStandardItemModel *model);
 
    private slots:
     void on_Add_clicked();
 
    private:
     Ui::AddWindow *ui;
-    Song *song;
     QStandardItemModel *model;
+    QStringList *lst;
 };
 
 #endif  // ADDWINDOW_H

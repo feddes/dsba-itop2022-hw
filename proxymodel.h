@@ -7,7 +7,8 @@ class ProxyModel : public QSortFilterProxyModel
 
 {
    public:
-    ProxyModel(QObject* parent = 0);
+    //flag == true => playlist; flag == false => mainwindow;
+    ProxyModel(QObject* parent = 0, bool flag = false);
 
     QString getArtist() const { return this->artist; }
     QString getGenre() const { return this->genre; }
@@ -51,6 +52,7 @@ class ProxyModel : public QSortFilterProxyModel
     int minDance, minEnergy, minDur;
     int maxDance, maxEnergy, maxDur;
     int minYear, maxYear;
+    bool flag;
 };
 
 #endif  // PROXYMODEL_H

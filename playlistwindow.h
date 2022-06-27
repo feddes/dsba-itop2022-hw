@@ -1,10 +1,10 @@
-#ifndef PLAYLISTWINDOW_H
+﻿#ifndef PLAYLISTWINDOW_H
 #define PLAYLISTWINDOW_H
 
 #include <QDialog>
 #include <QStandardItemModel>
 #include <vector>
-
+#include <set>
 #include "proxymodel.h"
 #include "song.h"
 
@@ -19,10 +19,10 @@ class playlistWindow : public QDialog
 
    public:
     explicit playlistWindow(QWidget *parent = nullptr,
-                            const std::vector<Song> &plst = {});
+                            QStandardItemModel *plst = nullptr, QStringList *lst = {});
     ~playlistWindow();
 
-    void createPlayList();
+    void insertRow(Song sng, int i);
 
    private slots:
 
@@ -32,13 +32,17 @@ class playlistWindow : public QDialog
 
     void on_Artist_textChanged(const QString &arg1);
 
-    void on_Genre_textChanged(const QString &arg1);
+    void on_Del_clicked();
 
-   private:
+    void on_Genre_currentTextChanged(const QString &arg1);
+
+    void on_loadCSV_clicked();
+
+private:
     Ui::playlistWindow *ui;
-    QStandardItemModel *model;
-    const std::vector<Song> &plst;
+    QStandardItemModel *plst;
     ProxyModel *prModel;
+    QStringList *lst;
 };
 
 #endif  // PLAYLISTWINDOW_H

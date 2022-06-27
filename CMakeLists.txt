@@ -38,7 +38,9 @@ set(PROJECT_SOURCES
         addwindow.h
         addwindow.cpp
         addwindow.ui
-
+        editwindow.h
+        editwindow.cpp
+        editwindow.ui
         )
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(BigHW
